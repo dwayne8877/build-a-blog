@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% for i in display_posts: %}
+
+    <div id="subject">
+      <a href={{i.get_permalink()}}>{{i.subject}}</a>
+    </div>
+
+    <div id="post_content">
+      {{i.content}}
+    </div>
+
+    <div id="created">
+      {{i.created}}
+    </div>
+    <br>
+    <br>
+  {% endfor %}
+
+{% endblock %}

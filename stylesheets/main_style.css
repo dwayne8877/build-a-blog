@@ -1,0 +1,16 @@
+html {
+  font-family: sans-serif;
+}
+
+#header {
+  text-align: center;
+  border-bottom: 1px solid grey
+}
+
+#buttons {
+  padding: 0px 0px 20px 0px;
+}
+
+#content {
+  padding: 40px 0px 0px 200px;
+}
