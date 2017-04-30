@@ -1,28 +1,64 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Basic Blog - GAE Demo</title>
-        <link rel = "stylesheet" type = "text/css" href = "/stylesheets/main_style.css"/>
+        <title>build-a-blog</title>
+        <style type="text/css">
+            .error {
+                color: red;
+                font-weight: bold;
+                margin-top: 5px;
+            }
+            div {
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
+            body {
+                font-family: sans-serif;
+                width: 800px;
+                margin: 0 auto;
+                padding: 2px;
+            }
+            label {
+                display: block;
+                font-size: 20px;
+                padding: 2px;
+            }
+            input[type=text] {
+                width: 400px;
+                font-size: 20px;
+                padding: 2px;
+            }
+            textarea {
+                width: 800px;
+                height: 200px;
+                font-size: 17px;
+                font-family: monospace;
+                padding: 2px;
+            }
+            input[type=submit] {
+                font-size: 24px;
+                margin-top: 10px;
+            }
+            .title {
+                font-weight: bold;
+                font-size: 20px;
+            }
+            .blog-post {
+                margin: 20;
+                font-size: 17px;
+                padding: 5px;
+            }
+        </style>
     </head>
-    <body>
-      <div id="header">
-        <h1>
-            <a href="/blog">Blog</a>
-        </h1>
 
-          <div id="buttons">
-            <form method="get" action="/newpost">
-              <button type="submit">New Post</button>
-            </form>
-            <form method="get" action="/blog">
-              <button type="submit">View Posts</button>
-            </form>
-          </div>
-      </div>
-      <div id="content">
-        {% block content %}
-        {% endblock %}
-      </div>
+            <body>
+                <br>
+                <h1>build-a-blog</h1>
+                <hr>
+                <br>
 
-    </body>
+                {% block content %}
+                {% endblock %}
+
+            </body>
 </html>
