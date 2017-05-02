@@ -1,14 +1,36 @@
-import webapp2
+#!/usr/bin/env python
+#
+# Copyright 2007 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 import os
+import webapp2
 import jinja2
 
 from google.appengine.ext import db
 
-#Jinja template init
+#set up jinja
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
+                                autoescape = True)
 
-#Handler helper class
+class Post(db.Model):
+    #Post class with title and body
+    title = db.StringProperty(required=True)
+    body = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -20,58 +42,62 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
-#Post db object constructor
-class Post(db.Model):
-    subject = db.StringProperty(required = True)
-    content = db.TextProperty(required = True)
-    created = db.DateTimeProperty(auto_now_add = True)
-
-    def get_permalink(self):
-        return "/blog/" + str(self.key().id_or_name())
-
-#Front page handler
-class Index(Handler):
+class MainPage(Handler):
     def get(self):
-        self.render('blog.html')
+        more = "N"
+        page = self.request.get("page")
 
-#New post handler
+        #if no page is set then direct to 1(main)
+        if page == "":
+            page = 1
+        else:
+            page = int(page)
+
+        #return 5 posts per page; use the page number to determine the offset.
+        #if page 1, then get posts 0 - 4, if page 2, get posts 5 - 9
+        posts = get_posts(5, (page - 1) * 5)
+
+        #check to see if there are posts for the next page. If so, set the
+        #more tag to true.
+        if(posts.count(limit = 5, offset=(page*5)) > 0):
+            more = "Y"
+        self.render("homepage.html", posts=posts, error="", more=more, page=page)
+
 class NewPost(Handler):
     def get(self):
-        self.render('newpost.html')
+        #render basic add new post page
+        self.render("new_post.html", title="", body="", error="")
 
     def post(self):
-        subject = self.request.get('subject')
-        content = self.request.get('content')
+        title = self.request.get("title")
+        body = self.request.get("body")
 
-        if subject and content:
-            p = Post(subject = subject, content = content)
-            p.put()
-            link = str(p.key().id())
-            self.redirect('/blog/' + link)
+        if title and body:
+        #if both title and body are input, add post to database and redirect
+        #to blog page
+            newpost = Post(title=title, body=body)
+            newpost.put()
+            self.redirect("/blog/" + str(newpost.key().id()))
         else:
-            error = "subject and content, please!"
-            self.render("newpost.html", subject=subject, content=content, error=error)
+        #if either title or body are missing, redisplay new post page with
+        #previously entered content and error message
+            error = "Both a title and blog post are required."
+            self.render("new_post.html", title=title, body=body, error=error)
 
-#Post view handler
 class ViewPostHandler(Handler):
     def get(self, id):
-        p = Post.get_by_id(int(id))
+        a = Post.get_by_id(long(id))
+        self.render("view_post.html", post = a)
 
-        if not p:
-            error = "Post does not exist!"
-            self.render("postview.html", error=error)
-        else:
-            self.render("postview.html", subject=p.subject, content=p.content, created=p.created)
-
-#Blog handler
-class Blog(Handler):
-    def get(self):
-        display_posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 5")
-        self.render('blog.html', display_posts = display_posts)
+def get_posts(limit, offset):
+    sql_string = ("SELECT * FROM Post ORDER BY created DESC LIMIT " + str(limit)
+        + " OFFSET " + str(offset))
+    posts = db.GqlQuery(sql_string)
+    return posts
 
 app = webapp2.WSGIApplication([
-    ('/', Blog),
-    ('/blog', Blog),
+    ('/', MainPage),
+    ('/blog', MainPage),
     ('/newpost', NewPost),
-    webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
+    webapp2.Route('/blog/<id:\d+>', ViewPostHandler),
 ], debug=True)

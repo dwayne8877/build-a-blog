@@ -1,64 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>build-a-blog</title>
-        <style type="text/css">
-            .error {
-                color: red;
-                font-weight: bold;
-                margin-top: 5px;
-            }
-            div {
-                margin-top: 5px;
-                margin-bottom: 5px;
-            }
-            body {
-                font-family: sans-serif;
-                width: 800px;
-                margin: 0 auto;
-                padding: 2px;
-            }
-            label {
-                display: block;
-                font-size: 20px;
-                padding: 2px;
-            }
-            input[type=text] {
-                width: 400px;
-                font-size: 20px;
-                padding: 2px;
-            }
-            textarea {
-                width: 800px;
-                height: 200px;
-                font-size: 17px;
-                font-family: monospace;
-                padding: 2px;
-            }
-            input[type=submit] {
-                font-size: 24px;
-                margin-top: 10px;
-            }
-            .title {
-                font-weight: bold;
-                font-size: 20px;
-            }
-            .blog-post {
-                margin: 20;
-                font-size: 17px;
-                padding: 5px;
-            }
-        </style>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="/css/stylesheet.css"/>
     </head>
-
-            <body>
-                <br>
-                <h1>build-a-blog</h1>
-                <hr>
-                <br>
-
+    <body>
+        <div class="top-nav-wrapper">
+            <div class="top-container">
+                <ul class="top-nav">
+                    <li id="menu-item-001"><a href="/blog">HOME</a></li>
+                    <li id="menu-item-002"><a href="/newpost">ADD NEW</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-content-wrapper">
+            <div class="container">
                 {% block content %}
                 {% endblock %}
-
-            </body>
+            </div>
+        </div>
+    </body>
 </html>
